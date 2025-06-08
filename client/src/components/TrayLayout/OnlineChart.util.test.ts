@@ -731,6 +731,20 @@ test('isLessThanHours returns correctly', () => {
     ).not.toBeTruthy();
 });
 
+describe('roundTo', () => {
+    it('does not change hour when already aligned to 3 hour boundary', async () => {
+        const { roundTo } = await import('./OnlineChart.util');
+        const dt = DateTime.fromISO('2021-06-19T12:10:00');
+        expect(roundTo(dt).hour).toBe(12);
+    });
+
+    it('rounds up to the next 3 hour boundary', async () => {
+        const { roundTo } = await import('./OnlineChart.util');
+        const dt = DateTime.fromISO('2021-06-19T13:00:00');
+        expect(roundTo(dt).hour).toBe(15);
+    });
+});
+
 export // Use an empty export to please Babel's single file emit.
 // https://github.com/Microsoft/TypeScript/issues/15230
  {};
