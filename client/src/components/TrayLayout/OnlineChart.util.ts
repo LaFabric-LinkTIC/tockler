@@ -13,10 +13,14 @@ const clampItem =
     };
 
 export const roundTo = (start: DateTime) => {
-    const roundToMin = 3;
-    const remainder = roundToMin - (start.hour % roundToMin);
+    const roundToHours = 3;
+    const remainder = start.hour % roundToHours;
 
-    return start.plus({ hours: remainder });
+    if (remainder === 0) {
+        return start;
+    }
+
+    return start.plus({ hours: roundToHours - remainder });
 };
 
 export enum CLOCK_MODE {
