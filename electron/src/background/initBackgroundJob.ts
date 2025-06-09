@@ -10,6 +10,7 @@ import {
     watchAndSetStatusTrackItem,
     watchAndSetStatusTrackItemCleanup,
 } from './watchTrackItems/watchAndSetStatusTrackItem';
+import { webhookQueue } from '../utils/webhookQueue';
 
 let logger = logManager.getLogger('BackgroundJob');
 
@@ -18,7 +19,7 @@ export async function initBackgroundJob() {
     const dataSettings = await dbClient.fetchDataSettings();
     logger.debug('With settings:', dataSettings);
 
-    const { idleAfterSeconds, backgroundJobInterval } = dataSettings;
+    const { idleAfterSeconds, backgroundJobInterval, webhookRetryMinutes } = dataSettings;
 
     watchForIdleState(idleAfterSeconds);
     watchForPowerState();
@@ -29,6 +30,7 @@ export async function initBackgroundJob() {
     watchAndSetLogTrackItem();
 
     watchForBreakNotification();
+    webhookQueue.start(webhookRetryMinutes);
 }
 
 export async function cleanupBackgroundJob() {

@@ -1,6 +1,9 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+vi.mock('electron');
+vi.mock('electron-is-dev');
+vi.mock('../utils/log-manager');
 import { Client } from '@libsql/client';
 import { drizzle } from 'drizzle-orm/libsql';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { TrackItem, trackItems } from '../drizzle/schema';
 import { State } from '../enums/state';
 import { TrackItemType } from '../enums/track-item-type';
@@ -8,11 +11,6 @@ import { COLORS } from './color.testUtils';
 import { setupTestDb } from './db.testUtils';
 import { changeStateAndMockDate, selectAllAppItems } from './query.testUtils';
 import { getTimestamp } from './time.testUtils';
-
-// Create mocks
-vi.mock('electron');
-vi.mock('electron-is-dev');
-vi.mock('../utils/log-manager');
 
 // Setup in-memory database
 let client: Client;

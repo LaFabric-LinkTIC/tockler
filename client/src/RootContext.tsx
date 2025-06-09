@@ -20,6 +20,7 @@ const defaultWorkSettings: WorkSettingsI = {
 const defaultDataSettings: DataSettingsI = {
     idleAfterSeconds: 60,
     backgroundJobInterval: 3,
+    webhookRetryMinutes: 5,
 };
 
 interface RootContextType {
@@ -57,8 +58,11 @@ export const RootProvider = ({ children }: RootProviderProps) => {
     }, []);
 
     const updateDataSettings = useCallback((newDataSettings: DataSettingsI) => {
-        setDataSettings(newDataSettings);
-        saveDataSettings(newDataSettings);
+        setDataSettings((prev) => {
+            const updated = { ...prev, ...newDataSettings };
+            saveDataSettings(updated);
+            return updated;
+        });
     }, []);
 
     const loadSettings = useCallback(async () => {

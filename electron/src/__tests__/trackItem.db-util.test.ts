@@ -1,10 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('electron');
+vi.mock('../utils/log-manager');
 
 import { NewTrackItem } from '../drizzle/schema';
 import { getTimestamp } from './time.testUtils'; // Importing getTimestamp
-
-vi.mock('electron');
-vi.mock('../utils/log-manager');
 
 describe('splitTrackItemAtMidnight', () => {
     it('should not split item when begin and end dates are on the same day', async () => {

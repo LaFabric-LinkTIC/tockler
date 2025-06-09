@@ -1,20 +1,5 @@
-import { Client } from '@libsql/client';
-import { drizzle } from 'drizzle-orm/libsql';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { TrackItemRaw } from '../app/task-analyser.utils';
-import { TrackItem, trackItems } from '../drizzle/schema';
-import { State } from '../enums/state';
-import { TrackItemType } from '../enums/track-item-type';
-import { COLORS } from './color.testUtils';
-import { addColorToApp, setupTestDb } from './db.testUtils';
-import { changeStateAndMockDate, selectAllAppItems } from './query.testUtils';
-import { getTimestamp } from './time.testUtils';
-import { visualizeTrackItems } from './visualize.testUtils';
-
-// Store handlers for IPC events
 const eventHandlers: Record<string, any> = {};
-
-// Create mocks
 vi.mock('electron', async () => ({
     app: {
         getPath: vi.fn(() => ''),
@@ -25,10 +10,19 @@ vi.mock('electron', async () => ({
         }),
     },
 }));
-
 vi.mock('electron-is-dev');
-
 vi.mock('../utils/log-manager');
+import { Client } from '@libsql/client';
+import { drizzle } from 'drizzle-orm/libsql';
+import { TrackItemRaw } from '../app/task-analyser.utils';
+import { TrackItem, trackItems } from '../drizzle/schema';
+import { State } from '../enums/state';
+import { TrackItemType } from '../enums/track-item-type';
+import { COLORS } from './color.testUtils';
+import { addColorToApp, setupTestDb } from './db.testUtils';
+import { changeStateAndMockDate, selectAllAppItems } from './query.testUtils';
+import { getTimestamp } from './time.testUtils';
+import { visualizeTrackItems } from './visualize.testUtils';
 
 // Setup in-memory database
 let client: Client;

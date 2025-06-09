@@ -10,6 +10,7 @@ import { dbClient } from './drizzle/dbClient';
 import { OrderByKey } from './drizzle/query.utils';
 import { TrackItem } from './drizzle/schema';
 import { setupMainHandler } from './utils/setupMainHandler';
+import { webhookQueue } from './utils/webhookQueue';
 
 const settingsActions = {
     fetchAnalyserSettingsJsonString: async () => {
@@ -122,5 +123,15 @@ const trackItemActions = {
     },
 };
 
+const webhookActions = {
+    getWebhookStats: async () => {
+        return webhookQueue.stats();
+    },
+};
+
 export const initIpcActions = () =>
-    setupMainHandler({ ipcMain } as any, { ...settingsActions, ...appSettingsActions, ...trackItemActions }, true);
+    setupMainHandler(
+        { ipcMain } as any,
+        { ...settingsActions, ...appSettingsActions, ...trackItemActions, ...webhookActions },
+        true,
+    );
