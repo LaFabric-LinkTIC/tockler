@@ -6,6 +6,7 @@ import { State } from '../../enums/state';
 import { TrackItemType } from '../../enums/track-item-type';
 import { appEmitter } from '../../utils/appEmitter';
 import { logManager } from '../../utils/log-manager';
+import { webhookQueue } from '../../utils/webhookQueue';
 
 const logger = logManager.getLogger('watchAndSetLogTrackItemCleanup');
 
@@ -35,6 +36,7 @@ async function cutLogTrackItem(state: State) {
         };
 
         await dbClient.insertTrackItemInternal(itemToInsert);
+        webhookQueue.add(itemToInsert);
     } else if (state === State.Online) {
         currentLogItem.beginDate = now;
     }
@@ -59,6 +61,7 @@ async function stopRunningLogTrackItem(endDate: number) {
     };
 
     await dbClient.insertTrackItemInternal(itemToInsert);
+    webhookQueue.add(itemToInsert);
     currentLogItem = null;
 }
 
@@ -120,6 +123,7 @@ const saveOngoingTrackItem = async () => {
     if (currentLogItem) {
         currentLogItem.endDate = Date.now();
         await dbClient.insertTrackItemInternal(currentLogItem);
+        webhookQueue.add(currentLogItem);
         currentLogItem = null;
     }
 };

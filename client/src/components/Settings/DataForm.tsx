@@ -12,6 +12,7 @@ const schema = yup
     .object({
         idleAfterSeconds: yup.string().required().label('Idle after in Seconds'),
         backgroundJobInterval: yup.number().required().positive().integer().label('Session Length'),
+        webhookRetryMinutes: yup.number().required().positive().integer().label('Webhook retry interval (minutes)'),
     })
     .required();
 
@@ -60,6 +61,18 @@ export const DataForm = () => {
                     Background job runs every 3 seconds by default. In there application checks active window title and
                     the state of system (idle, offline, online)
                 </Text>
+            </Box>
+
+            <FormControl isInvalid={!!errors.webhookRetryMinutes} pb={4}>
+                <FormLabel htmlFor="webhookRetryMinutes">Webhook retry interval (minutes)</FormLabel>
+                <Input placeholder="Webhook retry interval" {...register('webhookRetryMinutes')} />
+                <FormErrorMessage>
+                    {errors.webhookRetryMinutes && errors.webhookRetryMinutes.message}
+                </FormErrorMessage>
+            </FormControl>
+
+            <Box pt={0} pb={6}>
+                <Text fontSize="sm" as="i">Interval between attempts to resend failed log webhooks.</Text>
             </Box>
 
             <FormControl isInvalid={!!errors.idleAfterSeconds} pb={4}>
