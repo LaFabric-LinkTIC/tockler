@@ -1,3 +1,14 @@
+// Ensure Electron's path file exists to avoid runtime errors when modules try
+// to resolve the binary. This file is normally created during installation but
+// is skipped in CI where postinstall scripts do not run.
+import { writeFileSync, existsSync } from 'fs';
+import { join } from 'path';
+
+const pathFile = join(__dirname, 'node_modules', 'electron', 'path.txt');
+if (!existsSync(pathFile)) {
+    writeFileSync(pathFile, 'electron');
+}
+
 // Mock electron
 vi.mock('electron', () => {
     return {
