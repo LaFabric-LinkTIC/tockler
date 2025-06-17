@@ -63,18 +63,11 @@ jobs:
         strategy:
             matrix:
                 include:
-                    - os: ubuntu-latest
-                      node-version: 22.x
-                      arch: x64
                     - os: windows-latest
                       node-version: 22.x
                       arch: x64
-                    - os: macos-13
-                      node-version: 22.x
-                      arch: x64
-                    - os: macos-latest
-                      node-version: 22.x
-                      arch: arm64
+
+
 
         steps:
             - uses: actions/checkout@v4
