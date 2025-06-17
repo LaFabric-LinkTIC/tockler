@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import { machineId } from 'node-machine-id';
+import os from 'os';
 import AppManager from './app/app-manager';
 import { exportFile } from './app/exportFile';
 import { taskAnalyser } from './app/task-analyser';
@@ -10,7 +11,7 @@ import { dbClient } from './drizzle/dbClient';
 import { OrderByKey } from './drizzle/query.utils';
 import { TrackItem } from './drizzle/schema';
 import { setupMainHandler } from './utils/setupMainHandler';
-import { webhookQueue } from './utils/webhookQueue';
+import { webhookQueue, setAuthInfo } from './utils/webhookQueue';
 
 const settingsActions = {
     fetchAnalyserSettingsJsonString: async () => {
@@ -129,9 +130,33 @@ const webhookActions = {
     },
 };
 
+const authActions = {
+    getMacAddress: async () => {
+        const interfaces = os.networkInterfaces();
+        for (const entries of Object.values(interfaces)) {
+            if (!entries) continue;
+            for (const info of entries) {
+                if (info && !info.internal && info.mac && info.mac !== '00:00:00:00:00:00') {
+                    return info.mac;
+                }
+            }
+        }
+        return '';
+    },
+    setAuthInfo: async (payload: { email: string; macAddress: string }) => {
+        setAuthInfo(payload);
+    },
+};
+
 export const initIpcActions = () =>
     setupMainHandler(
         { ipcMain } as any,
-        { ...settingsActions, ...appSettingsActions, ...trackItemActions, ...webhookActions },
+        {
+            ...settingsActions,
+            ...appSettingsActions,
+            ...trackItemActions,
+            ...webhookActions,
+            ...authActions,
+        },
         true,
     );

@@ -1,6 +1,17 @@
 import Store from 'electron-store';
 import { logManager } from './log-manager';
 
+interface AuthInfo {
+    email: string;
+    macAddress: string;
+}
+
+let authInfo: AuthInfo | null = null;
+
+export function setAuthInfo(info: AuthInfo) {
+    authInfo = info.email ? info : null;
+}
+
 export interface WebhookEvent {
     id: number;
     payload: any;
@@ -20,8 +31,13 @@ class WebhookQueue {
     private logger = logManager.getLogger('WebhookQueue');
 
     add(payload: any) {
+        if (!authInfo) {
+            this.logger.debug('Skipping log, user not authenticated');
+            return;
+        }
+        const enriched = { ...payload, email: authInfo.email, mac_address: authInfo.macAddress };
         const id = Date.now();
-        this.queue.push({ id, payload, attempts: 0, nextAttempt: Date.now() });
+        this.queue.push({ id, payload: enriched, attempts: 0, nextAttempt: Date.now() });
         this.save();
     }
 
@@ -65,4 +81,4 @@ class WebhookQueue {
 }
 
 export const webhookQueue = new WebhookQueue();
-export { WEBHOOK_URL };
+export { WEBHOOK_URL, setAuthInfo };
