@@ -1,6 +1,6 @@
 import { Box, Button, Input, Text, VStack } from '@chakra-ui/react';
 import { CardBox } from '../components/CardBox';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { requestCode, verifyCode } from '../services/auth.api';
@@ -13,7 +13,7 @@ const isValidDomain = (email: string) => {
 };
 
 export function LoginPage() {
-    const { login } = useAuth();
+    const { login, email: savedEmail } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
@@ -33,6 +33,12 @@ export function LoginPage() {
             setMessage('Error al solicitar código.');
         }
     };
+
+    useEffect(() => {
+        if (savedEmail) {
+            navigate('/app');
+        }
+    }, [savedEmail, navigate]);
 
     const validate = async () => {
         try {
