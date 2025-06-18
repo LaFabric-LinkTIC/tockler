@@ -33,7 +33,7 @@ export function useEventListener<T extends Event>(
     element: Window | HTMLElement | Document = window,
 ) {
     // Create a ref that stores handler
-    const savedHandler = useRef<(event: T) => void>();
+    const savedHandler = useRef<(event: T) => void>(handler);
 
     // Update ref.current value if handler changes.
     // This allows our effect below to always get latest handler ...
@@ -51,7 +51,7 @@ export function useEventListener<T extends Event>(
             if (!isSupported) return;
 
             // Create event listener that calls handler function stored in ref
-            const eventListener = (event: T) => savedHandler.current?.(event);
+            const eventListener: EventListener = (event) => savedHandler.current(event as T);
 
             // Add event listener
             element.addEventListener(eventName, eventListener);
