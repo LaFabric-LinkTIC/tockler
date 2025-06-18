@@ -32,6 +32,7 @@ interface StoreType {
     isLoggingEnabled: boolean;
     isAutoUpdateEnabled: boolean;
     macAutoHideMenuBarEnabled: boolean;
+    userEmail?: string;
     windowsize: {
         width: number;
         height: number;
