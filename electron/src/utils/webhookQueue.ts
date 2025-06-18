@@ -24,15 +24,21 @@ class WebhookQueue {
 
     add(payload: any) {
         const id = Date.now();
+        this.logger.debug('Add event', payload);
         this.queue.push({ id, payload, attempts: 0, nextAttempt: Date.now() });
         this.save();
+
+        if (!this.timer) {
+            const retry = (config.persisted.get('webhookRetryMinutes') as number | undefined) ?? 5;
+            this.start(retry);
+        }
     }
 
     stats() {
         return { pending: this.queue.length, sent: this.sent };
     }
 
-    start(intervalMinutes: number) {
+    start(intervalMinutes: number = 5) {
         if (this.timer) return;
         const intervalMs = Math.max(1, intervalMinutes) * 60 * 1000;
         this.timer = setInterval(() => this.process(), intervalMs);
