@@ -20,7 +20,7 @@ export const TrayItemEdit = ({ saveTimelineItem }) => {
         if (windowIsActive) {
             setTrackItem((oldItem) => ({ ...oldItem, color: randomcolor() }));
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+         
     }, [windowIsActive]);
 
     const changeColorHandler = (color) => {

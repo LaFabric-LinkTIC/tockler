@@ -24,6 +24,7 @@ class WebhookQueue {
 
     add(payload: any) {
         const id = Date.now();
+        this.logger.debug('Adding event to queue', { id, payload });
         this.queue.push({ id, payload, attempts: 0, nextAttempt: Date.now() });
         this.save();
     }
@@ -35,18 +36,22 @@ class WebhookQueue {
     start(intervalMinutes: number) {
         if (this.timer) return;
         const intervalMs = Math.max(1, intervalMinutes) * 60 * 1000;
+        this.logger.debug('Starting webhook queue', { intervalMs });
         this.timer = setInterval(() => this.process(), intervalMs);
         this.process().catch((e) => this.logger.error('process error', e));
     }
 
     private async process() {
+        this.logger.debug('Processing queue', { size: this.queue.length });
         const email = config.persisted.get('userEmail') as string | undefined;
         if (!email) {
+            this.logger.debug('No email configured, skipping');
             return;
         }
         if (!this.machineId) {
             try {
                 this.machineId = await machineId(true);
+                this.logger.debug('Machine ID retrieved', { machineId: this.machineId });
             } catch (e) {
                 this.logger.error('machineId error', e);
             }
@@ -59,12 +64,16 @@ class WebhookQueue {
                     email,
                     mac_address: this.machineId,
                 };
+                this.logger.debug('Sending event', { id: event.id, attempts: event.attempts });
                 const res = await fetch(LOG_ACTIVITY_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                 });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                this.logger.debug('Event sent', { id: event.id, status: res.status });
                 this.queue = this.queue.filter((e) => e.id !== event.id);
                 this.sent++;
             } catch (e) {
@@ -75,6 +84,7 @@ class WebhookQueue {
             }
         }
         this.save();
+        this.logger.debug('Process finished', { pending: this.queue.length, sent: this.sent });
     }
 
     private save() {
