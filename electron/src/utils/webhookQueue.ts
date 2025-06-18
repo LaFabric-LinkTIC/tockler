@@ -2,6 +2,7 @@ import Store from 'electron-store';
 import { machineId } from 'node-machine-id';
 import { logManager } from './log-manager';
 import { config } from './config';
+import { LOG_ACTIVITY_URL } from '../webhook.constants';
 
 export interface WebhookEvent {
     id: number;
@@ -10,7 +11,6 @@ export interface WebhookEvent {
     nextAttempt: number;
 }
 
-const WEBHOOK_URL = 'https://auto.linktic.com/webhook/tockler/log-activity';
 const BASE_BACKOFF_MS = 60 * 1000; // 1 minute
 const MAX_BACKOFF_MS = 60 * 60 * 1000; // 1 hour
 
@@ -59,7 +59,7 @@ class WebhookQueue {
                     email,
                     mac_address: this.machineId,
                 };
-                const res = await fetch(WEBHOOK_URL, {
+                const res = await fetch(LOG_ACTIVITY_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
@@ -84,4 +84,4 @@ class WebhookQueue {
 }
 
 export const webhookQueue = new WebhookQueue();
-export { WEBHOOK_URL };
+export { LOG_ACTIVITY_URL };
