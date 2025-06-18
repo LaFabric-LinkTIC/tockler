@@ -11,6 +11,7 @@ import { OrderByKey } from './drizzle/query.utils';
 import { TrackItem } from './drizzle/schema';
 import { setupMainHandler } from './utils/setupMainHandler';
 import { webhookQueue } from './utils/webhookQueue';
+import { config } from './utils/config';
 
 const settingsActions = {
     fetchAnalyserSettingsJsonString: async () => {
@@ -129,9 +130,21 @@ const webhookActions = {
     },
 };
 
+const authActions = {
+    getUserEmail: async () => {
+        return config.persisted.get('userEmail');
+    },
+    setUserEmail: async (payload: { email: string }) => {
+        config.persisted.set('userEmail', payload.email);
+    },
+    clearUserEmail: async () => {
+        config.persisted.delete('userEmail');
+    },
+};
+
 export const initIpcActions = () =>
     setupMainHandler(
         { ipcMain } as any,
-        { ...settingsActions, ...appSettingsActions, ...trackItemActions, ...webhookActions },
+        { ...settingsActions, ...appSettingsActions, ...trackItemActions, ...webhookActions, ...authActions },
         true,
     );

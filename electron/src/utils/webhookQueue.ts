@@ -1,5 +1,7 @@
 import Store from 'electron-store';
+import { machineId } from 'node-machine-id';
 import { logManager } from './log-manager';
+import { config } from './config';
 
 export interface WebhookEvent {
     id: number;
@@ -18,6 +20,7 @@ class WebhookQueue {
     private sent = this.store.get('sent', 0);
     private timer: NodeJS.Timeout | null = null;
     private logger = logManager.getLogger('WebhookQueue');
+    private machineId: string | null = null;
 
     add(payload: any) {
         const id = Date.now();
@@ -37,13 +40,29 @@ class WebhookQueue {
     }
 
     private async process() {
+        const email = config.persisted.get('userEmail') as string | undefined;
+        if (!email) {
+            return;
+        }
+        if (!this.machineId) {
+            try {
+                this.machineId = await machineId(true);
+            } catch (e) {
+                this.logger.error('machineId error', e);
+            }
+        }
         for (const event of [...this.queue]) {
             if (event.nextAttempt > Date.now()) continue;
             try {
+                const payload = {
+                    ...event.payload,
+                    email,
+                    mac_address: this.machineId,
+                };
                 const res = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(event.payload),
+                    body: JSON.stringify(payload),
                 });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 this.queue = this.queue.filter((e) => e.id !== event.id);

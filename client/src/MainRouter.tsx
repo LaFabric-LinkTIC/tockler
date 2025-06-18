@@ -7,10 +7,13 @@ import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
 import { TrayLayout } from './components/TrayLayout/TrayLayout';
 import { Logger } from './logger';
 import { RootProvider } from './RootContext';
+import { AuthProvider } from './AuthContext';
+import { RequireAuth } from './RequireAuth';
 import { ChartThemeProvider } from './routes/ChartThemeProvider';
 import { MainAppPage } from './routes/MainAppPage';
 import { NotificationAppPage } from './routes/NotificationAppPage';
 import { TrayAppPage } from './routes/TrayAppPage';
+import { LoginPage } from './routes/LoginPage';
 import { ElectronEventEmitter } from './services/ElectronEventEmitter';
 import { mainStore } from './store/mainStore';
 import { useGoogleAnalytics } from './useGoogleAnalytics';
@@ -39,39 +42,45 @@ export function MainRouter() {
 
     return (
         <ChartThemeProvider>
-            <RootProvider>
-                <Routes>
-                    {/* Main App with main store */}
-                    <Route
-                        path="/app/*"
-                        element={
-                            <StoreProvider store={mainStore}>
-                                <MainAppPage />
-                            </StoreProvider>
-                        }
-                    />
+            <AuthProvider>
+                <RootProvider>
+                    <Routes>
+                        {/* Main App with main store */}
+                        <Route
+                            path="/app/*"
+                            element={
+                                <RequireAuth>
+                                    <StoreProvider store={mainStore}>
+                                        <MainAppPage />
+                                    </StoreProvider>
+                                </RequireAuth>
+                            }
+                        />
 
-                    {/* Redirect from root to /app */}
-                    <Route path="/" element={<Navigate to="/app" replace />} />
+                        <Route path="/login" element={<LoginPage />} />
 
-                    {/* Tray App - No longer needs trayStore */}
-                    <Route
-                        path="/trayApp"
-                        element={
-                            <TrayLayout>
-                                <ErrorBoundary>
-                                    <TrayAppPage />
-                                </ErrorBoundary>
-                            </TrayLayout>
-                        }
-                    />
+                        {/* Redirect from root to /app */}
+                        <Route path="/" element={<Navigate to="/app" replace />} />
 
-                    <Route path="/notificationApp" element={<NotificationAppPage />} />
+                        {/* Tray App - No longer needs trayStore */}
+                        <Route
+                            path="/trayApp"
+                            element={
+                                <TrayLayout>
+                                    <ErrorBoundary>
+                                        <TrayAppPage />
+                                    </ErrorBoundary>
+                                </TrayLayout>
+                            }
+                        />
 
-                    {/* Fallback redirect to /app */}
-                    <Route path="*" element={<Navigate to="/app" replace />} />
-                </Routes>
-            </RootProvider>
+                        <Route path="/notificationApp" element={<NotificationAppPage />} />
+
+                        {/* Fallback redirect to /app */}
+                        <Route path="*" element={<Navigate to="/app" replace />} />
+                    </Routes>
+                </RootProvider>
+            </AuthProvider>
         </ChartThemeProvider>
     );
 }
