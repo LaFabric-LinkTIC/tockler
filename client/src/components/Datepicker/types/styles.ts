@@ -13,7 +13,7 @@ import {
     StackProps,
 } from '@chakra-ui/react';
 
-export type StateProp<T extends any> = { base: T; active?: T };
+export type StateProp<T> = { base: T; active?: T };
 
 export interface ActionButtonStyles {
     actionButton: Partial<IconButtonProps>;
@@ -31,7 +31,7 @@ export interface DatepickerComponentStyles {
     datepickerHeader: FlexProps;
 }
 
-export interface DayState<T extends any> {
+export interface DayState<T> {
     base: T;
     normal: T;
     rangeHover: T;

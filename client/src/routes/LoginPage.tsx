@@ -28,7 +28,7 @@ export function LoginPage() {
             await requestCode(email);
             setMessage('Código enviado.');
             setStep('code');
-        } catch (e) {
+        } catch {
             setMessage('Error al solicitar código.');
         }
     };
