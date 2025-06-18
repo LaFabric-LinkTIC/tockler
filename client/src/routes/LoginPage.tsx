@@ -1,4 +1,5 @@
 import { Box, Button, Input, Text, VStack } from '@chakra-ui/react';
+import { CardBox } from '../components/CardBox';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
@@ -28,7 +29,7 @@ export function LoginPage() {
             await requestCode(email);
             setMessage('Código enviado.');
             setStep('code');
-        } catch (e) {
+        } catch {
             setMessage('Error al solicitar código.');
         }
     };
@@ -44,22 +45,24 @@ export function LoginPage() {
     };
 
     return (
-        <Box p={4} maxW="sm" mx="auto">
-            {step === 'email' && (
-                <VStack spacing={3} alignItems="flex-start">
-                    <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" />
-                    <Button onClick={sendEmail}>Enviar</Button>
-                    {message && <Text color="red.500">{message}</Text>}
-                </VStack>
-            )}
-            {step === 'code' && (
-                <VStack spacing={3} alignItems="flex-start">
-                    <Text>{email}</Text>
-                    <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Código" />
-                    <Button onClick={validate}>Validar</Button>
-                    {message && <Text color="red.500">{message}</Text>}
-                </VStack>
-            )}
+        <Box p={4} maxW="sm" mx="auto" mt={10}>
+            <CardBox title="Iniciar sesión" divider>
+                {step === 'email' && (
+                    <VStack spacing={3} alignItems="flex-start">
+                        <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" />
+                        <Button onClick={sendEmail}>Enviar</Button>
+                        {message && <Text color="red.500">{message}</Text>}
+                    </VStack>
+                )}
+                {step === 'code' && (
+                    <VStack spacing={3} alignItems="flex-start">
+                        <Text>{email}</Text>
+                        <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Código" />
+                        <Button onClick={validate}>Validar</Button>
+                        {message && <Text color="red.500">{message}</Text>}
+                    </VStack>
+                )}
+            </CardBox>
         </Box>
     );
 }
